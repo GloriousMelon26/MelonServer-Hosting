@@ -1,0 +1,20 @@
+{
+  "name": "Eaglercraft Server Node",
+  "image": "://microsoft.com",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.java"
+      ]
+    }
+  },
+  "forwardPorts": [8081, 25565],
+  "portsAttributes": {
+    "8081": {
+      "label": "Eaglercraft WebSocket",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh"
+}

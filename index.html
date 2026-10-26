@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EaglerNode - Web Hosting Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --accent: #3b82f6;
+            --text: #f8fafc;
+            --success: #10b981;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text);
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+        }
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #2563eb; }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background-color: var(--success);
+        }
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0 1rem 0;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        code {
+            background: #0f172a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EaglerNode Server Dashboard</h1>
+            <span class="status-badge">API Gateway Active</span>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Deploy Dynamic Proxy Node</h2>
+                <p>Since traditional server listening sockets fail within restricted client runtimes, instances leverage raw WebSockets via cloud configuration runtimes.</p>
+                
+                <label for="node-version">Eaglercraft Engine Version</label>
+                <select id="node-version">
+                    <option value="1.8.8">1.8.8 (ViaVersion Core)</option>
+                    <option value="1.5.2">1.5.2 (Legacy Stable)</option>
+                </select>
+
+                <label for="tunnel-endpoint">Codespace Public Forwarding URI</label>
+                <input type="text" id="tunnel-endpoint" placeholder="wss://your-codespace-8081.app.github.dev">
+
+                <button class="btn" onclick="initializeServerNode()">Generate Client Payload</button>
+
+                <div id="output-pane" style="margin-top: 1.5rem; display: none;">
+                    <h3>Connection Credentials</h3>
+                    <p>Add this listener endpoint to your client-side Server List:</p>
+                    <code id="connection-string"></code>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Architecture Status</h2>
+                <ul>
+                    <li><strong>Frontend:</strong> GitHub Pages (Static Asset Delivery)</li>
+                    <li><strong>Backend Runtime:</strong> GitHub Codespaces</li>
+                    <li><strong>Network Routing:</strong> Portless Secure Tunneling via Reverse Proxy</li>
+                </ul>
+                <hr style="border-color: #334155;">
+                <h3>Operational Parameters</h3>
+                <small>Ensure your <code>config.yml</code> inside the proxy environment specifies <code>online_mode: false</code> to accommodate translating handshakes gracefully.</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function initializeServerNode() {
+            const inputUri = document.getElementById('tunnel-endpoint').value;
+            const outputPane = document.getElementById('output-pane');
+            const connectionString = document.getElementById('connection-string');
+
+            if (!inputUri) {
+                alert('Please supply an active Codespace public WebSocket address.');
+                return;
+            }
+
+            // Normalizing tracking strings to guarantee protocol stability
+            let proxyAddress = inputUri.trim();
+            if(!proxyAddress.startsWith('ws://') && !proxyAddress.startsWith('wss://')) {
+                proxyAddress = 'wss://' + proxyAddress;
+            }
+
+            connectionString.innerText = proxyAddress;
+            outputPane.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
