@@ -1,5 +1,5 @@
 {
-  "name": "Eaglercraft Server Node",
+  "name": "Eaglercraft 1.12.2 Server Node",
   "image": "://microsoft.com",
   "customizations": {
     "vscode": {
@@ -8,10 +8,10 @@
       ]
     }
   },
-  "forwardPorts": [8081, 25565],
+  "forwardPorts": [ 8081 ],
   "portsAttributes": {
     "8081": {
-      "label": "Eaglercraft WebSocket",
+      "label": "Eaglercraft WebSocket Proxy",
       "onAutoForward": "notify",
       "visibility": "public"
     }

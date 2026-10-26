@@ -3,144 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EaglerNode - Web Hosting Dashboard</title>
+    <title>EaglerNode - Super Simple Deploy</title>
     <style>
         :root {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
             --accent: #3b82f6;
             --text: #f8fafc;
-            --success: #10b981;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-primary);
             color: var(--text);
             margin: 0;
             padding: 2rem;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
+            min-height: 80vh;
         }
         .card {
             background-color: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.4);
+            border: 1px solid #334155;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+        p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         .btn {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
+            padding: 0.85rem 1.5rem;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+            font-size: 1rem;
             transition: background 0.2s;
         }
-        .btn:hover { background-color: #2563eb; }
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            background-color: var(--success);
+        .btn:hover {
+            background-color: #2563eb;
         }
-        input, select {
+        label {
+            display: block;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #3b82f6;
+        }
+        input {
             width: 100%;
-            padding: 0.5rem;
-            margin: 0.5rem 0 1rem 0;
+            padding: 0.85rem;
+            margin: 0.5rem 0;
             background: #0f172a;
             border: 1px solid #334155;
             color: white;
-            border-radius: 4px;
+            border-radius: 6px;
             box-sizing: border-box;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .result {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: #0f172a;
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+            word-break: break-all;
+            display: none;
         }
         code {
-            background: #0f172a;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
             font-family: monospace;
+            color: #60a5fa;
+            font-size: 1.1rem;
+            display: block;
+            margin-top: 0.5rem;
+            background: #1e293b;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #334155;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>EaglerNode Server Dashboard</h1>
-            <span class="status-badge">API Gateway Active</span>
-        </header>
 
-        <div class="grid">
-            <div class="card">
-                <h2>Deploy Dynamic Proxy Node</h2>
-                <p>Since traditional server listening sockets fail within restricted client runtimes, instances leverage raw WebSockets via cloud configuration runtimes.</p>
-                
-                <label for="node-version">Eaglercraft Engine Version</label>
-                <select id="node-version">
-                    <option value="1.8.8">1.8.8 (ViaVersion Core)</option>
-                    <option value="1.5.2">1.5.2 (Legacy Stable)</option>
-                </select>
+    <div class="card">
+        <h2>One-Click Server Address Generator</h2>
+        <p>Just enter your GitHub Codespace Name (e.g., <code>musical-space-waddle-q7967v64xx34p4x</code>) found in your browser URL bar or dashboard.</p>
+        
+        <label for="codespace-id">Codespace Name/ID</label>
+        <input type="text" id="codespace-id" placeholder="Enter codespace name here...">
 
-                <label for="tunnel-endpoint">Codespace Public Forwarding URI</label>
-                <input type="text" id="tunnel-endpoint" placeholder="wss://your-codespace-8081.app.github.dev">
+        <button class="btn" onclick="generateAddress()">Get Server Address</button>
 
-                <button class="btn" onclick="initializeServerNode()">Generate Client Payload</button>
-
-                <div id="output-pane" style="margin-top: 1.5rem; display: none;">
-                    <h3>Connection Credentials</h3>
-                    <p>Add this listener endpoint to your client-side Server List:</p>
-                    <code id="connection-string"></code>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>Architecture Status</h2>
-                <ul>
-                    <li><strong>Frontend:</strong> GitHub Pages (Static Asset Delivery)</li>
-                    <li><strong>Backend Runtime:</strong> GitHub Codespaces</li>
-                    <li><strong>Network Routing:</strong> Portless Secure Tunneling via Reverse Proxy</li>
-                </ul>
-                <hr style="border-color: #334155;">
-                <h3>Operational Parameters</h3>
-                <small>Ensure your <code>config.yml</code> inside the proxy environment specifies <code>online_mode: false</code> to accommodate translating handshakes gracefully.</small>
-            </div>
+        <div id="result-box" class="result">
+            <strong>Your Eaglercraft Server Address:</strong>
+            <code id="server-address"></code>
+            <p style="font-size: 0.85rem; margin-top: 0.75rem; color: #64748b; margin-bottom: 0;">Copy this address directly into your Eaglercraft multiplayer server list!</p>
         </div>
     </div>
 
     <script>
-        function initializeServerNode() {
-            const inputUri = document.getElementById('tunnel-endpoint').value;
-            const outputPane = document.getElementById('output-pane');
-            const connectionString = document.getElementById('connection-string');
+        function generateAddress() {
+            const rawId = document.getElementById('codespace-id').value.trim();
+            const resultBox = document.getElementById('result-box');
+            const serverAddress = document.getElementById('server-address');
 
-            if (!inputUri) {
-                alert('Please supply an active Codespace public WebSocket address.');
+            if (!rawId) {
+                alert('Please enter a valid Codespace name.');
                 return;
             }
 
-            // Normalizing tracking strings to guarantee protocol stability
-            let proxyAddress = inputUri.trim();
-            if(!proxyAddress.startsWith('ws://') && !proxyAddress.startsWith('wss://')) {
-                proxyAddress = 'wss://' + proxyAddress;
+            // Automatically strips away accidental full URLs or duplicate ports if pasted
+            let cleanId = rawId.replace('https://', '')
+                             .replace('.app.github.dev', '')
+                             .replace('-8081', '');
+            
+            // Extract just the main subdomain if a full URL was provided
+            if (cleanId.includes('.')) {
+                cleanId = cleanId.split('.')[0];
             }
 
-            connectionString.innerText = proxyAddress;
-            outputPane.style.display = 'block';
+            // Construct standard GitHub Codespaces public proxy template format
+            const finalUri = `wss://${cleanId}-8081.app.github.dev`;
+
+            serverAddress.innerText = finalUri;
+            resultBox.style.display = 'block';
         }
     </script>
 </body>
