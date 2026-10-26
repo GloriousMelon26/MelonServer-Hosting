@@ -3,111 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EaglerNode - Web Client Panel</title>
+    <title>Eaglercraft Skin Fetcher</title>
     <style>
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --accent: #3b82f6;
-            --text: #f8fafc;
-        }
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e24;
+            color: #fff;
             margin: 0;
-            padding: 2rem;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+        h1 { margin-bottom: 5px; color: #4caf50; }
+        p { color: #aaa; margin-top: 0; margin-bottom: 20px; }
         .container {
-            max-width: 600px;
-            width: 100%;
-            background-color: var(--bg-secondary);
+            background-color: #2a2a32;
+            padding: 30px;
             border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.4);
-            border: 1px solid #334155;
-            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
         }
-        .btn {
-            background-color: var(--accent);
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #4caf50;
             color: white;
             border: none;
-            padding: 0.85rem 1.5rem;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 1rem;
-            font-size: 1rem;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.2s;
         }
-        input {
-            width: 100%;
-            padding: 0.85rem;
-            margin: 0.5rem 0;
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: white;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        #game-container {
-            width: 100%;
-            max-width: 900px;
-            height: 500px;
+        button:hover { background-color: #45a049; }
+        .preview-box {
+            margin-top: 25px;
             display: none;
-            border: 2px solid #334155;
+            flex-direction: column;
+            align-items: center;
+        }
+        #skinPreview {
+            width: 128px;
+            height: 128px;
+            image-rendering: pixelated;
+            border: 4px solid #4caf50;
+            background-color: #3a3a45;
             border-radius: 8px;
-            overflow: hidden;
+            margin-bottom: 15px;
         }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .action-btn {
+            background-color: #008cba;
+            margin: 5px;
         }
+        .action-btn:hover { background-color: #007bb5; }
+        .error { color: #ff6b6b; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="setup-box">
-        <h2>Eaglercraft Web Player Portal</h2>
-        <p>Enter your target server WebSocket address below to connect instantly through the web client wrapper.</p>
-        
-        <label for="server-ip"><strong>Server WebSocket URL</strong></label>
-        <input type="text" id="server-ip" placeholder="wss://://example.com">
+    <h1>Eaglercraft Skin Hub</h1>
+    <p>Fetch Premium Minecraft skins for use in Eaglercraft clients</p>
 
-        <button class="btn" onclick="launchClient()">Launch Web Client</button>
-    </div>
+    <div class="container">
+        <!-- Using Mojang API fallback for reliability on GitHub Pages -->
+        <input type="text" id="usernameInput" placeholder="Enter Premium Java Username (e.g., Notch)">
+        <button onclick="fetchSkin()">Fetch Skin</button>
+        <div id="errorMessage" class="error"></div>
 
-    <!-- Client Frame Container -->
-    <div id="game-container">
-        <iframe id="client-frame" src=""></iframe>
+        <div class="preview-box" id="previewBox">
+            <h3>Skin Preview (Raw Texture)</h3>
+            <img id="skinPreview" src="" alt="Skin Preview">
+            <div>
+                <button class="action-btn" onclick="copySkinUrl()">Copy Skin URL</button>
+                <button class="action-btn" onclick="downloadSkin()">Download PNG</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        function launchClient() {
-            const rawUrl = document.getElementById('server-ip').value.trim();
-            if (!rawUrl) {
-                alert('Please enter a server address.');
+        let currentSkinUrl = "";
+
+        async function fetchSkin() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            const previewBox = document.getElementById('previewBox');
+            const skinPreview = document.getElementById('skinPreview');
+
+            errorDiv.innerText = "";
+            previewBox.style.display = "none";
+
+            if (!username) {
+                errorDiv.innerText = "Please enter a valid username.";
                 return;
             }
 
-            // Standard public client loader wrapper
-            // Replace with your preferred open-source client repository link if needed
-            const clientLoaderBase = "https://github.io"; 
-            
-            // Appends the server URI parameter to force-inject the server into the client list
-            const finalGameUrl = `${clientLoaderBase}?server=${encodeURIComponent(rawUrl)}`;
+            try {
+                // Ashcon provides a reliable, CORS-friendly API proxy to fetch premium textures directly in-browser
+                const response = await fetch(`https://ashcon.app{username}`);
+                if (!response.ok) throw new Error("User not found or API error.");
 
-            // Hide the configuration layout and expand the game display frame
-            document.getElementById('setup-box').style.display = 'none';
-            const container = document.getElementById('game-container');
-            const frame = document.getElementById('client-frame');
-            
-            frame.src = finalGameUrl;
-            container.style.display = 'block';
+                const data = await response.json();
+                if (data.textures && data.textures.skin) {
+                    currentSkinUrl = data.textures.skin.url;
+                    
+                    // Display raw skin layout
+                    skinPreview.src = currentSkinUrl;
+                    previewBox.style.display = "flex";
+                } else {
+                    throw new Error("This user doesn't have a custom skin.");
+                }
+            } catch (err) {
+                errorDiv.innerText = err.message || "Failed to load skin. Try another premium username.";
+            }
+        }
+
+        function copySkinUrl() {
+            if (!currentSkinUrl) return;
+            navigator.clipboard.writeText(currentSkinUrl);
+            alert("Skin URL copied! You can now paste this URL into your Eaglercraft Custom Skin settings.");
+        }
+
+        function downloadSkin() {
+            if (!currentSkinUrl) return;
+            const a = document.createElement('a');
+            a.href = currentSkinUrl;
+            a.download = `${document.getElementById('usernameInput').value.trim()}_skin.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
