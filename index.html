@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EaglerNode - Super Simple Deploy</title>
+    <title>EaglerNode - Web Client Panel</title>
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -12,34 +12,24 @@
             --text: #f8fafc;
         }
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             background-color: var(--bg-primary);
             color: var(--text);
             margin: 0;
             padding: 2rem;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 80vh;
         }
-        .card {
+        .container {
+            max-width: 600px;
+            width: 100%;
             background-color: var(--bg-secondary);
             border-radius: 12px;
-            padding: 2.5rem;
-            max-width: 500px;
-            width: 100%;
+            padding: 2rem;
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.4);
             border: 1px solid #334155;
-        }
-        h2 {
-            margin-top: 0;
-            font-size: 1.5rem;
-            color: #fff;
-        }
-        p {
-            color: #94a3b8;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            margin-bottom: 2rem;
         }
         .btn {
             background-color: var(--accent);
@@ -52,19 +42,6 @@
             width: 100%;
             margin-top: 1rem;
             font-size: 1rem;
-            transition: background 0.2s;
-        }
-        .btn:hover {
-            background-color: #2563eb;
-        }
-        label {
-            display: block;
-            margin-top: 1.5rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #3b82f6;
         }
         input {
             width: 100%;
@@ -75,78 +52,62 @@
             color: white;
             border-radius: 6px;
             box-sizing: border-box;
-            font-size: 1rem;
         }
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        .result {
-            margin-top: 1.5rem;
-            padding: 1.25rem;
-            background: #0f172a;
-            border-left: 4px solid var(--accent);
-            border-radius: 4px;
-            word-break: break-all;
+        #game-container {
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
             display: none;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
         }
-        code {
-            font-family: monospace;
-            color: #60a5fa;
-            font-size: 1.1rem;
-            display: block;
-            margin-top: 0.5rem;
-            background: #1e293b;
-            padding: 0.5rem;
-            border-radius: 4px;
-            border: 1px solid #334155;
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>One-Click Server Address Generator</h2>
-        <p>Just enter your GitHub Codespace Name (e.g., <code>musical-space-waddle-q7967v64xx34p4x</code>) found in your browser URL bar or dashboard.</p>
+    <div class="container" id="setup-box">
+        <h2>Eaglercraft Web Player Portal</h2>
+        <p>Enter your target server WebSocket address below to connect instantly through the web client wrapper.</p>
         
-        <label for="codespace-id">Codespace Name/ID</label>
-        <input type="text" id="codespace-id" placeholder="Enter codespace name here...">
+        <label for="server-ip"><strong>Server WebSocket URL</strong></label>
+        <input type="text" id="server-ip" placeholder="wss://://example.com">
 
-        <button class="btn" onclick="generateAddress()">Get Server Address</button>
+        <button class="btn" onclick="launchClient()">Launch Web Client</button>
+    </div>
 
-        <div id="result-box" class="result">
-            <strong>Your Eaglercraft Server Address:</strong>
-            <code id="server-address"></code>
-            <p style="font-size: 0.85rem; margin-top: 0.75rem; color: #64748b; margin-bottom: 0;">Copy this address directly into your Eaglercraft multiplayer server list!</p>
-        </div>
+    <!-- Client Frame Container -->
+    <div id="game-container">
+        <iframe id="client-frame" src=""></iframe>
     </div>
 
     <script>
-        function generateAddress() {
-            const rawId = document.getElementById('codespace-id').value.trim();
-            const resultBox = document.getElementById('result-box');
-            const serverAddress = document.getElementById('server-address');
-
-            if (!rawId) {
-                alert('Please enter a valid Codespace name.');
+        function launchClient() {
+            const rawUrl = document.getElementById('server-ip').value.trim();
+            if (!rawUrl) {
+                alert('Please enter a server address.');
                 return;
             }
 
-            // Automatically strips away accidental full URLs or duplicate ports if pasted
-            let cleanId = rawId.replace('https://', '')
-                             .replace('.app.github.dev', '')
-                             .replace('-8081', '');
+            // Standard public client loader wrapper
+            // Replace with your preferred open-source client repository link if needed
+            const clientLoaderBase = "https://github.io"; 
             
-            // Extract just the main subdomain if a full URL was provided
-            if (cleanId.includes('.')) {
-                cleanId = cleanId.split('.')[0];
-            }
+            // Appends the server URI parameter to force-inject the server into the client list
+            const finalGameUrl = `${clientLoaderBase}?server=${encodeURIComponent(rawUrl)}`;
 
-            // Construct standard GitHub Codespaces public proxy template format
-            const finalUri = `wss://${cleanId}-8081.app.github.dev`;
-
-            serverAddress.innerText = finalUri;
-            resultBox.style.display = 'block';
+            // Hide the configuration layout and expand the game display frame
+            document.getElementById('setup-box').style.display = 'none';
+            const container = document.getElementById('game-container');
+            const frame = document.getElementById('client-frame');
+            
+            frame.src = finalGameUrl;
+            container.style.display = 'block';
         }
     </script>
 </body>
